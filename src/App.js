@@ -1,7 +1,7 @@
 import  React, { useState } from "react";
 import "./App.css";
 
-// Colour Theme
+// Contains constant properties for colours used in Game. 
 const colours = {
   available: "lightgray",
   used: "lightgreen",
@@ -43,7 +43,7 @@ const PlayNumber = props => (
   <button 
   className="number" 
   style={{ backgroundColor: colours[props.status]}}
-  onClick={() => console.log("Num", props.number)}>
+  onClick={() => props.onClick(props.number, props.status)}>
     {props.number}
   </button>
 );
@@ -59,10 +59,41 @@ const StarsDisplay = props => (
 function App() {
   const [stars, setStars] = useState(utils.random(1, 9));
 
-  const [availableNums, setAvaiilableNums] = useState([1, 2, 3, 4, 5]);
-  const [candidateNums, setCanidateNums] = useState([2, 3]);
+  const [availableNums, setAvaiilableNums] = useState(utils.range(1, 9));
+  const [candidateNums, setCanidateNums] = useState([]);
 
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
+
+  const onNumberClick = (number, currentStatus) =>
+  {
+    //currentStatus => newStatus
+    if(currentStatus === 'used')
+    {
+      return;
+    }
+    const newCandidateNums =
+    currentStatus ==='available'
+    ? candidateNums.concat(number)
+    : candidateNums.filter(cn => cn !== number);
+ 
+    
+    if (utils.sum(newCandidateNums) !== stars)
+    {
+      setCanidateNums(newCandidateNums);
+    }
+    else
+    {
+      const newAvailableNums = availableNums.filter(
+      
+        n => !newCandidateNums.includes(n)
+      );
+      //redraw stars (from what's available)
+      setStars(utils.randomSumIn(newAvailableNums, 9))
+      setAvaiilableNums(newAvailableNums);
+      setCanidateNums([]);
+    
+    }
+  }
 
   const numberStatus = (number) => {
     if (!availableNums.includes(number)) {
@@ -88,6 +119,7 @@ function App() {
               key={number}
               status={numberStatus(number)}
               number={number}
+              onClick={onNumberClick}
             />
           ))}
         </div>
