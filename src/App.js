@@ -1,8 +1,8 @@
-import { React, useState } from "react";
+import  React, { useState } from "react";
 import "./App.css";
 
-// Color Theme
-const colors = {
+// Colour Theme
+const colours = {
   available: "lightgray",
   used: "lightgreen",
   wrong: "lightcoral",
@@ -40,19 +40,39 @@ const utils = {
 };
 
 const PlayNumber = props => (
-  <button className="number" onClick={() => console.log('Num', props.number)}>{props.number}</button>
+  <button 
+  className="number" 
+  style={{ backgroundColor: colours[props.status]}}
+  onClick={() => console.log("Num", props.number)}>
+    {props.number}
+  </button>
 );
 
 const StarsDisplay = props => (
-   <>
-  {utils.range(1, props.count).map(starId => (
-    <div key={starId} className="star" />
-  ))}
+  <>
+    {utils.range(1, props.count).map(starId => (
+      <div key={starId} className="star" />
+    ))}
   </>
 );
 
 function App() {
-  const [stars, setStars] = useState(utils.random(1,9));
+  const [stars, setStars] = useState(utils.random(1, 9));
+
+  const [availableNums, setAvaiilableNums] = useState([1, 2, 3, 4, 5]);
+  const [candidateNums, setCanidateNums] = useState([2, 3]);
+
+  const candidatesAreWrong = utils.sum(candidateNums) > stars;
+
+  const numberStatus = (number) => {
+    if (!availableNums.includes(number)) {
+      return "used";
+    }
+    if (candidateNums.includes(number)) {
+      return candidatesAreWrong ? 'wrong': 'candidate';
+    }
+    return "available";
+  };
   return (
     <div className="game">
       <div className="help">
@@ -60,13 +80,16 @@ function App() {
       </div>
       <div className="body">
         <div className="left">
-          <StarsDisplay count={stars}/>
+          <StarsDisplay count={stars} />
         </div>
         <div className="right">
-          {utils.range(1, 9).map(number =>
-            (
-              <PlayNumber key={number} number={number} />
-            ))}
+          {utils.range(1, 9).map(number => (
+            <PlayNumber
+              key={number}
+              status={numberStatus(number)}
+              number={number}
+            />
+          ))}
         </div>
       </div>
       <div className="timer">Time Remaining: 10</div>
