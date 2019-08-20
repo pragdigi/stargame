@@ -65,16 +65,16 @@ function App() {
   const [secondsLeft, setSecondsLeft] = useState(10);
   useEffect(() => {
     if (secondsLeft > 0) {
-      setTimeout(() => {
+      const timerId = setTimeout(() => {
         setSecondsLeft(secondsLeft - 1);
       }, 1000);
+      return () => clearTimeout(timerId);
     }
     console.log("Done rendering");
-    return () => console.log("Component is going to rerender");
   });
 
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
-  const gameIsDone = availableNums.length === 0;
+  const gameStatus = availableNums.length === 0 ? "won" : secondsLeft === 0 ? "lost" : 'active';
 
   const resetGame = () => {
     setStars(utils.random(1, 9));
@@ -121,11 +121,12 @@ function App() {
       </div>
       <div className="body">
         <div className="left">
-          {gameIsDone ? (
-            <PlayAgain onClick={resetGame} />
+          {gameStatus !== 'active' ? (
+            <PlayAgain onClick={resetGame} gameStatus={gameStatus} />
           ) : (
             <StarsDisplay count={stars} />
           )}
+          
         </div>
         <div className="right">
           {utils.range(1, 9).map(number => (
@@ -145,6 +146,10 @@ function App() {
 
 const PlayAgain = props => (
   <div className="game-done">
+    <div className="message" style={{colour: props.gameStatus === 'lost' ? 'red' : 'green'}}>
+      {props.gameStatus === 'lost' ? 'Game Over' : 'Nice' }
+      
+    </div>
     <button onClick={props.onClick}>Play Again</button>
   </div>
 );
