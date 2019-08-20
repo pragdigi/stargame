@@ -1,7 +1,7 @@
-import  React, { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
-// Contains constant properties for colours used in Game. 
+// Contains constant properties for colours used in Game.
 const colours = {
   available: "lightgray",
   used: "lightgreen",
@@ -40,10 +40,11 @@ const utils = {
 };
 
 const PlayNumber = props => (
-  <button 
-  className="number" 
-  style={{ backgroundColor: colours[props.status]}}
-  onClick={() => props.onClick(props.number, props.status)}>
+  <button
+    className="number"
+    style={{ backgroundColor: colours[props.status] }}
+    onClick={() => props.onClick(props.number, props.status)}
+  >
     {props.number}
   </button>
 );
@@ -63,44 +64,43 @@ function App() {
   const [candidateNums, setCanidateNums] = useState([]);
 
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
+  const gameIsDone = availableNums.length === 0;
 
-  const onNumberClick = (number, currentStatus) =>
-  {
+  const resetGame = () => {
+    setStars(utils.random(1,9));
+    setAvaiilableNums(utils.range(1,9));
+    setCanidateNums([]);
+  };
+
+  const onNumberClick = (number, currentStatus) => {
     //currentStatus => newStatus
-    if(currentStatus === 'used')
-    {
+    if (currentStatus === "used") {
       return;
     }
     const newCandidateNums =
-    currentStatus ==='available'
-    ? candidateNums.concat(number)
-    : candidateNums.filter(cn => cn !== number);
- 
-    
-    if (utils.sum(newCandidateNums) !== stars)
-    {
+      currentStatus === "available"
+        ? candidateNums.concat(number)
+        : candidateNums.filter(cn => cn !== number);
+
+    if (utils.sum(newCandidateNums) !== stars) {
       setCanidateNums(newCandidateNums);
-    }
-    else
-    {
+    } else {
       const newAvailableNums = availableNums.filter(
-      
         n => !newCandidateNums.includes(n)
       );
       //redraw stars (from what's available)
-      setStars(utils.randomSumIn(newAvailableNums, 9))
+      setStars(utils.randomSumIn(newAvailableNums, 9));
       setAvaiilableNums(newAvailableNums);
       setCanidateNums([]);
-    
     }
-  }
+  };
 
-  const numberStatus = (number) => {
+  const numberStatus = number => {
     if (!availableNums.includes(number)) {
       return "used";
     }
     if (candidateNums.includes(number)) {
-      return candidatesAreWrong ? 'wrong': 'candidate';
+      return candidatesAreWrong ? "wrong" : "candidate";
     }
     return "available";
   };
@@ -111,7 +111,7 @@ function App() {
       </div>
       <div className="body">
         <div className="left">
-          <StarsDisplay count={stars} />
+          {gameIsDone ? <PlayAgain onClick={resetGame} /> : <StarsDisplay count={stars} />}
         </div>
         <div className="right">
           {utils.range(1, 9).map(number => (
@@ -128,5 +128,11 @@ function App() {
     </div>
   );
 }
+
+const PlayAgain = props => (
+  <div className="game-done">
+    <button onClick={props.onClick}>Play Again</button>
+  </div>
+);
 
 export default App;
