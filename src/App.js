@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 // Contains constant properties for colours used in Game.
@@ -62,13 +62,23 @@ function App() {
 
   const [availableNums, setAvaiilableNums] = useState(utils.range(1, 9));
   const [candidateNums, setCanidateNums] = useState([]);
+  const [secondsLeft, setSecondsLeft] = useState(10);
+  useEffect(() => {
+    if (secondsLeft > 0) {
+      setTimeout(() => {
+        setSecondsLeft(secondsLeft - 1);
+      }, 1000);
+    }
+    console.log("Done rendering");
+    return () => console.log("Component is going to rerender");
+  });
 
   const candidatesAreWrong = utils.sum(candidateNums) > stars;
   const gameIsDone = availableNums.length === 0;
 
   const resetGame = () => {
-    setStars(utils.random(1,9));
-    setAvaiilableNums(utils.range(1,9));
+    setStars(utils.random(1, 9));
+    setAvaiilableNums(utils.range(1, 9));
     setCanidateNums([]);
   };
 
@@ -111,7 +121,11 @@ function App() {
       </div>
       <div className="body">
         <div className="left">
-          {gameIsDone ? <PlayAgain onClick={resetGame} /> : <StarsDisplay count={stars} />}
+          {gameIsDone ? (
+            <PlayAgain onClick={resetGame} />
+          ) : (
+            <StarsDisplay count={stars} />
+          )}
         </div>
         <div className="right">
           {utils.range(1, 9).map(number => (
@@ -124,7 +138,7 @@ function App() {
           ))}
         </div>
       </div>
-      <div className="timer">Time Remaining: 10</div>
+      <div className="timer">Time Remaining: {secondsLeft}</div>
     </div>
   );
 }
